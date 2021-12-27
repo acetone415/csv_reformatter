@@ -1,21 +1,24 @@
+import argparse
 import csv
 import datetime
+import os
 from collections import namedtuple
-from pathlib import Path
 
-# Directories with csv files to reformat and reformatted files
-DIR_TO_REFORMAT = Path(__file__).parent / 'reports/to_reformat'
-DIR_REFORMATTED = Path(__file__).parent / 'reports/reformatted'
+
+parser = argparse.ArgumentParser()
+parser.add_argument('filepath', help='Path to input CSV file')
+parser.add_argument('-d', '--dir', default='./',
+    help='Directory for output CSV. Default=%(default)s')
+args = parser.parse_args()
+file_path = args.filepath
+output_csv_dir = args.dir
+
+input_filename = os.path.basename(file_path)
+output_filename = f'{datetime.datetime.now().date()}_{input_filename}'
+output_csv_path = os.path.join(output_csv_dir, output_filename)
+
 
 start_time = datetime.datetime.now()
-
-# Input filename
-filename = 'report_example2.csv'
-file_path = DIR_TO_REFORMAT / filename
-
-# Output file
-reformatted_csv = f'{datetime.datetime.now().date()}_{filename}'
-reformatted_csv_filepath = DIR_REFORMATTED / reformatted_csv
 
 keys = ('office', 'id', 'full_name', 'reg_numb', 'date')  # input file columns
 Person = namedtuple('Person', keys)
@@ -39,7 +42,7 @@ with open(file_path, encoding='utf_8', newline='\n') as csvfile:
             all_docs_list.append(employee.reg_numb)
 
 
-with open(reformatted_csv_filepath, 'w', encoding='utf-8', newline='\n') as csvfile:
+with open(output_csv_path, 'w', encoding='utf-8', newline='\n') as csvfile:
     writer = csv.writer(csvfile)
     writer.writerow(['Филиал', 'ФИО', 'ТН'] + all_docs_list)
     for item in info:
